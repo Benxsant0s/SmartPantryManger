@@ -1,7 +1,6 @@
-package com.example.smartpantrymanager.model;
+package com.example.smartpantrymanger.model;
 
 import java.util.List;
-
 
 public class Recipe {
     private int id;
