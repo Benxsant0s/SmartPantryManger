@@ -1,4 +1,4 @@
-package com.example.smartpantrymanger.model;
+package com.example.smartpantrymanager.model;
 
 
 public class PantryItem {
