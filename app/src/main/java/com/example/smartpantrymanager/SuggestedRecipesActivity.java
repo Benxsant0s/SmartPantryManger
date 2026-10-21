@@ -9,9 +9,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartpantrymanager.database.DatabaseHelper;
-import com.example.smartpantrymanager.model.PantryItem;
-import com.example.smartpantrymanager.model.Recipe;
+import com.example.smartpantrymanger.database.DatabaseHelper;
+import com.example.smartpantrymanger.model.PantryItem;
+import com.example.smartpantrymanger.model.Recipe;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,20 +28,22 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
     private RecipeAdapter adapter;
     private RecyclerView recyclerView;
     private TextView textEmpty, textCount;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_suggested_recipes);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         setTitle("Suggested Recipes");
-        if (getSupportActionBar() != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        }
 
         db = new DatabaseHelper(this);
         recyclerView = findViewById(R.id.recyclerRecipes);
         textEmpty = findViewById(R.id.textEmpty);
         textCount = findViewById(R.id.textCount);
+        bottomNav = findViewById(R.id.bottomNav);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecipeAdapter(new ArrayList<>(), recipe -> {
@@ -55,6 +59,7 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        NavHelper.setup(this, bottomNav, R.id.nav_recipes);
         loadSuggestions();
     }
 
@@ -77,12 +82,5 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
             textCount.setText("You can make " + suggested.size()
                     + (suggested.size() == 1 ? " recipe" : " recipes") + " right now");
         }
-    }
-
-    // Back arrow in the toolbar
-    @Override
-    public boolean onSupportNavigateUp() {
-        finish();
-        return true;
     }
 }

@@ -6,9 +6,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.smartpantrymanager.database.DatabaseHelper;
-import com.example.smartpantrymanager.model.Recipe;
-import com.example.smartpantrymanager.model.RecipeIngredient;
+import com.example.smartpantrymanger.database.DatabaseHelper;
+import com.example.smartpantrymanger.model.Recipe;
+import com.example.smartpantrymanger.model.RecipeIngredient;
+import com.google.android.material.appbar.MaterialToolbar;
 
 /**
  * Shows the full ingredient list and method for one recipe.
@@ -20,6 +21,10 @@ public class RecipeDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recipe_detail);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        setTitle("Recipe");
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
@@ -33,7 +38,6 @@ public class RecipeDetailActivity extends AppCompatActivity {
             return;
         }
 
-        setTitle("Recipe");
         TextView textName = findViewById(R.id.textRecipeName);
         TextView textIngredients = findViewById(R.id.textIngredients);
         TextView textSteps = findViewById(R.id.textSteps);

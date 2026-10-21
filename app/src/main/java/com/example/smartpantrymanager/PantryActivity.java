@@ -1,21 +1,21 @@
 package com.example.smartpantrymanager;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartpantrymanager.database.DatabaseHelper;
-import com.example.smartpantrymanager.model.PantryItem;
+import com.example.smartpantrymanger.database.DatabaseHelper;
+import com.example.smartpantrymanger.model.PantryItem;
+import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -23,24 +23,28 @@ import java.util.List;
 
 /**
  * Main screen: shows every ingredient in the pantry from the database.
- * The toolbar menu lets the user open the Suggested Recipes screen.
  */
 public class PantryActivity extends AppCompatActivity {
 
     private DatabaseHelper db;
     private PantryAdapter adapter;
     private RecyclerView recyclerView;
-    private TextView textEmpty;
+    private View emptyState;
+    private BottomNavigationView bottomNav;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pantry);
+
+        MaterialToolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         setTitle("My Pantry");
 
         db = new DatabaseHelper(this);
         recyclerView = findViewById(R.id.recyclerPantry);
-        textEmpty = findViewById(R.id.textEmpty);
+        emptyState = findViewById(R.id.emptyState);
+        bottomNav = findViewById(R.id.bottomNav);
         FloatingActionButton fab = findViewById(R.id.fabAdd);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -64,10 +68,14 @@ public class PantryActivity extends AppCompatActivity {
                 startActivity(new Intent(PantryActivity.this, AddEditIngredientActivity.class)));
     }
 
-    // Reload every time we come back, so edits/adds show immediately
+    // Reload every time we come back, so edits/adds/settings show immediately
     @Override
     protected void onResume() {
         super.onResume();
+        NavHelper.setup(this, bottomNav, R.id.nav_pantry);
+
+        SharedPreferences prefs = getSharedPreferences(SettingsActivity.PREFS, Context.MODE_PRIVATE);
+        adapter.setHighlightExpiring(prefs.getBoolean(SettingsActivity.KEY_EXPIRY_ALERTS, true));
         loadItems();
     }
 
@@ -75,7 +83,7 @@ public class PantryActivity extends AppCompatActivity {
         List<PantryItem> items = db.getAllItems();
         adapter.setItems(items);
         boolean empty = items.isEmpty();
-        textEmpty.setVisibility(empty ? View.VISIBLE : View.GONE);
+        emptyState.setVisibility(empty ? View.VISIBLE : View.GONE);
         recyclerView.setVisibility(empty ? View.GONE : View.VISIBLE);
     }
 
@@ -90,22 +98,5 @@ public class PantryActivity extends AppCompatActivity {
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
-    }
-
-    // Creates the toolbar menu (res/menu/menu_pantry.xml)
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_pantry, menu);
-        return true;
-    }
-
-    // Handles taps on the toolbar menu items
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (item.getItemId() == R.id.action_suggestions) {
-            startActivity(new Intent(this, SuggestedRecipesActivity.class));
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
