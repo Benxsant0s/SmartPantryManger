@@ -16,10 +16,7 @@ import com.example.smartpantrymanager.model.PantryItem;
 import java.util.Calendar;
 import java.util.Locale;
 
-/**
- * Screen used to add a new pantry item or edit an existing one.
- * If an "item_id" extra is passed in the Intent, the screen is in edit mode.
- */
+
 public class AddEditIngredientActivity extends AppCompatActivity {
 
     private static final String[] UNITS = {"g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"};
@@ -142,6 +139,8 @@ public class AddEditIngredientActivity extends AppCompatActivity {
             db.updateItem(new PantryItem(itemId, name, quantity, unit, expiryValue));
             Toast.makeText(this, "Ingredient updated", Toast.LENGTH_SHORT).show();
         }
+
+
         finish(); // return to the pantry list, which reloads in onResume()
     }
 }

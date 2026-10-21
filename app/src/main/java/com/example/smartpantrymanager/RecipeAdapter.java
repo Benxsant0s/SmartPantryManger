@@ -13,10 +13,7 @@ import com.example.smartpantrymanager.model.RecipeIngredient;
 
 import java.util.List;
 
-/**
- * Adapter that shows a list of recipes (name + ingredient summary)
- * in the Suggested Recipes screen.
- */
+
 public class RecipeAdapter extends RecyclerView.Adapter<RecipeAdapter.ViewHolder> {
 
     public interface OnRecipeClickListener {
