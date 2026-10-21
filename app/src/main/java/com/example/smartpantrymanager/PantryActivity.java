@@ -1,4 +1,4 @@
-package com.example.smartpantrymanager ;
+package com.example.smartpantrymanager;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,8 +11,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartpantrymanager .database.DatabaseHelper;
-import com.example.smartpantrymanager .model.PantryItem;
+import com.example.smartpantrymanager.database.DatabaseHelper;
+import com.example.smartpantrymanager.model.PantryItem;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -56,6 +56,21 @@ public class PantryActivity extends AppCompatActivity {
 
         fab.setOnClickListener(v ->
                 startActivity(new Intent(PantryActivity.this, AddEditIngredientActivity.class)));
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(android.view.Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_pantry, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(android.view.MenuItem item) {
+        if (item.getItemId() == R.id.action_suggestions) {
+            startActivity(new Intent(this, SuggestedRecipesActivity.class));
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override

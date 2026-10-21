@@ -1,4 +1,4 @@
-package com.example.smartpantrymanager .database;
+package com.example.smartpantrymanager.database;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -6,9 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.smartpantrymanager .model.PantryItem;
-import com.example.smartpantrymanager .model.Recipe;
-import com.example.smartpantrymanager .model.RecipeIngredient;
+import com.example.smartpantrymanager.model.PantryItem;
+import com.example.smartpantrymanager.model.Recipe;
+import com.example.smartpantrymanager.model.RecipeIngredient;
 
 import java.util.ArrayList;
 import java.util.List;

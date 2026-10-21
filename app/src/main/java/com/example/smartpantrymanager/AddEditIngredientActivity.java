@@ -1,4 +1,4 @@
-package com.example.smartpantrymanager ;
+package com.example.smartpantrymanager;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -10,8 +10,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.smartpantrymanager .database.DatabaseHelper;
-import com.example.smartpantrymanager .model.PantryItem;
+import com.example.smartpantrymanager.database.DatabaseHelper;
+import com.example.smartpantrymanager.model.PantryItem;
 
 import java.util.Calendar;
 import java.util.Locale;
