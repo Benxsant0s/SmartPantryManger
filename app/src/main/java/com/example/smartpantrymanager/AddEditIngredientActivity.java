@@ -1,4 +1,4 @@
-package com.example.smartpantrymanager;
+package com.example.smartpantrymanager ;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
@@ -10,14 +10,16 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.smartpantrymanager.R;
-import com.example.smartpantrymanager.database.DatabaseHelper;
-import com.example.smartpantrymanager.model.PantryItem;
+import com.example.smartpantrymanager .database.DatabaseHelper;
+import com.example.smartpantrymanager .model.PantryItem;
 
 import java.util.Calendar;
 import java.util.Locale;
 
-
+/**
+ * Screen used to add a new pantry item or edit an existing one.
+ * If an "item_id" extra is passed in the Intent, the screen is in edit mode.
+ */
 public class AddEditIngredientActivity extends AppCompatActivity {
 
     private static final String[] UNITS = {"g", "kg", "ml", "l", "tsp", "tbsp", "cup", "pcs"};
@@ -40,10 +42,12 @@ public class AddEditIngredientActivity extends AppCompatActivity {
         Button buttonSave = findViewById(R.id.buttonSave);
         Button buttonClearDate = findViewById(R.id.buttonClearDate);
 
+        // Fill the unit spinner
         ArrayAdapter<String> unitAdapter = new ArrayAdapter<>(
                 this, android.R.layout.simple_spinner_dropdown_item, UNITS);
         spinnerUnit.setAdapter(unitAdapter);
 
+        // Read the Intent extra to decide between add and edit mode
         itemId = getIntent().getIntExtra("item_id", -1);
         if (itemId != -1) {
             setTitle("Edit ingredient");
@@ -57,6 +61,7 @@ public class AddEditIngredientActivity extends AppCompatActivity {
         buttonSave.setOnClickListener(v -> saveItem());
     }
 
+    // Edit mode: load the existing record and show it in the form
     private void loadItemForEditing() {
         PantryItem item = db.getItemById(itemId);
         if (item == null) {
@@ -82,19 +87,6 @@ public class AddEditIngredientActivity extends AppCompatActivity {
 
     private void showDatePicker() {
         Calendar cal = Calendar.getInstance();
-        String currentText = editExpiry.getText().toString().trim();
-        if (!currentText.isEmpty()) {
-            try {
-                String[] parts = currentText.split("-");
-                if (parts.length == 3) {
-                    int year = Integer.parseInt(parts[0]);
-                    int month = Integer.parseInt(parts[1]) - 1;
-                    int day = Integer.parseInt(parts[2]);
-                    cal.set(year, month, day);
-                }
-            } catch (Exception ignored) {
-            }
-        }
         new DatePickerDialog(this, (view, year, month, day) -> {
             // Stored as yyyy-MM-dd text
             editExpiry.setText(String.format(Locale.US, "%04d-%02d-%02d", year, month + 1, day));
@@ -107,6 +99,7 @@ public class AddEditIngredientActivity extends AppCompatActivity {
         String unit = spinnerUnit.getSelectedItem().toString();
         String expiry = editExpiry.getText().toString().trim();
 
+        // ---------- Input validation ----------
         if (name.isEmpty()) {
             editName.setError("Name is required");
             editName.requestFocus();
@@ -137,12 +130,15 @@ public class AddEditIngredientActivity extends AppCompatActivity {
             return;
         }
 
+        // Empty expiry is saved as null (it is optional)
         String expiryValue = expiry.isEmpty() ? null : expiry;
 
         if (itemId == -1) {
+            // CREATE
             db.insertItem(new PantryItem(0, name, quantity, unit, expiryValue));
             Toast.makeText(this, "Ingredient added", Toast.LENGTH_SHORT).show();
         } else {
+            // UPDATE
             db.updateItem(new PantryItem(itemId, name, quantity, unit, expiryValue));
             Toast.makeText(this, "Ingredient updated", Toast.LENGTH_SHORT).show();
         }

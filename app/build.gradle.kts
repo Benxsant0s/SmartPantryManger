@@ -3,13 +3,13 @@ plugins {
 }
 
 android {
-    namespace = "com.example.smartpantrymanager"
+    namespace = "com.example.smartpantrymanger "
     compileSdk {
         version = release(37)
     }
 
     defaultConfig {
-        applicationId = "com.example.smartpantrymanager"
+        applicationId = "com.example.smartpantrymanger "
         minSdk = 24
         targetSdk = 37
         versionCode = 1
