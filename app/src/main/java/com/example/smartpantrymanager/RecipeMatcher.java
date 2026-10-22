@@ -5,19 +5,43 @@ import com.example.smartpantrymanager.model.Recipe;
 import com.example.smartpantrymanager.model.RecipeIngredient;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 public class RecipeMatcher {
+
+    public static class RecipeMatch {
+        private final Recipe recipe;
+        private final boolean canMake;
+        private final List<String> missingIngredients;
+        private final int matchedCount;
+        private final int totalCount;
+
+        public RecipeMatch(Recipe recipe, boolean canMake, List<String> missingIngredients, int matchedCount, int totalCount) {
+            this.recipe = recipe;
+            this.canMake = canMake;
+            this.missingIngredients = missingIngredients;
+            this.matchedCount = matchedCount;
+            this.totalCount = totalCount;
+        }
+
+        public Recipe getRecipe() { return recipe; }
+        public boolean isCanMake() { return canMake; }
+        public List<String> getMissingIngredients() { return missingIngredients; }
+        public int getMatchedCount() { return matchedCount; }
+        public int getTotalCount() { return totalCount; }
+    }
 
     /**
      * Normalises ingredient names for matching:
      * - Trims whitespace and converts to lowercase
-     * - Strips common adjectives for broader matching ("fresh", "table", "extra virgin", etc.)
+     * - Strips common adjectives ("fresh", "table", "extra virgin", etc.)
      * - Handles plural endings ("ies" -> "y", "oes" -> "o", "s" -> "")
      */
     public static String normaliseName(String raw) {
         if (raw == null) return "";
-        String n = raw.trim().toLowerCase();
+        String n = raw.trim().toLowerCase(Locale.US);
 
         n = n.replace("extra virgin ", "")
              .replace("fresh ", "")
@@ -54,7 +78,6 @@ public class RecipeMatcher {
             return true;
         }
 
-        // Whole word check (e.g. "olive oil" matches "oil", "cheddar cheese" matches "cheese")
         return containsWord(p, r) || containsWord(r, p);
     }
 
@@ -78,7 +101,7 @@ public class RecipeMatcher {
      */
     public static double toBaseQuantity(double quantity, String unit) {
         if (unit == null) return quantity;
-        switch (unit.trim().toLowerCase()) {
+        switch (unit.trim().toLowerCase(Locale.US)) {
             case "kg":
                 return quantity * 1000;
             case "l":
@@ -98,44 +121,71 @@ public class RecipeMatcher {
     }
 
     /**
-     * Checks if the pantry has enough quantity for a required recipe ingredient.
-     * Every required ingredient in the recipe must be present in the pantry in sufficient quantity.
+     * Evaluates a recipe against the current pantry, calculating matched count and missing ingredients.
      */
-    public static boolean canMake(Recipe recipe, List<PantryItem> pantry) {
-        if (recipe == null || recipe.getIngredients() == null) return false;
-        if (pantry == null || pantry.isEmpty()) return false;
+    public static RecipeMatch getMatchDetails(Recipe recipe, List<PantryItem> pantry) {
+        if (recipe == null || recipe.getIngredients() == null) {
+            return new RecipeMatch(recipe, false, Collections.emptyList(), 0, 0);
+        }
 
-        for (RecipeIngredient need : recipe.getIngredients()) {
-            double requiredBase = toBaseQuantity(need.getQuantity(), need.getUnit());
-            double totalAvailable = 0;
-            boolean foundIngredientInPantry = false;
+        List<RecipeIngredient> needs = recipe.getIngredients();
+        int totalCount = needs.size();
+        int matchedCount = 0;
+        List<String> missing = new ArrayList<>();
 
-            for (PantryItem p : pantry) {
-                if (p.getQuantity() <= 0) continue;
+        if (pantry != null && !pantry.isEmpty()) {
+            for (RecipeIngredient need : needs) {
+                double requiredBase = toBaseQuantity(need.getQuantity(), need.getUnit());
+                double totalAvailable = 0;
 
-                if (isNameMatch(p.getName(), need.getName())) {
-                    foundIngredientInPantry = true;
-                    double availableBase = toBaseQuantity(p.getQuantity(), p.getUnit());
-                    totalAvailable += availableBase;
+                for (PantryItem p : pantry) {
+                    if (p.getQuantity() <= 0) continue;
+                    if (isNameMatch(p.getName(), need.getName())) {
+                        totalAvailable += toBaseQuantity(p.getQuantity(), p.getUnit());
+                    }
+                }
+
+                if (totalAvailable >= requiredBase - 0.000001) {
+                    matchedCount++;
+                } else if (totalAvailable > 0) {
+                    double neededBase = requiredBase - totalAvailable;
+                    missing.add(formatQuantity(neededBase, need.getUnit()) + " " + need.getUnit() + " " + need.getName());
+                } else {
+                    missing.add(formatQuantity(need.getQuantity(), need.getUnit()) + " " + need.getUnit() + " " + need.getName());
                 }
             }
-
-            if (!foundIngredientInPantry) {
-                return false; // Ingredient missing completely
-            }
-
-            // Allow tiny floating point tolerance when comparing quantities
-            if (totalAvailable < requiredBase - 0.000001) {
-                return false; // Not enough quantity
+        } else {
+            for (RecipeIngredient need : needs) {
+                missing.add(formatQuantity(need.getQuantity(), need.getUnit()) + " " + need.getUnit() + " " + need.getName());
             }
         }
 
-        return true;
+        boolean canMake = (matchedCount == totalCount && totalCount > 0);
+        return new RecipeMatch(recipe, canMake, missing, matchedCount, totalCount);
     }
 
-    /**
-     * Returns all recipes from allRecipes that can be fully cooked with the pantry items.
-     */
+    private static String formatQuantity(double q, String unit) {
+        double displayQty = q;
+        if ("kg".equalsIgnoreCase(unit) || "l".equalsIgnoreCase(unit)) {
+            displayQty = q / 1000.0;
+        } else if ("tbsp".equalsIgnoreCase(unit)) {
+            displayQty = q / 15.0;
+        } else if ("tsp".equalsIgnoreCase(unit)) {
+            displayQty = q / 5.0;
+        } else if ("cup".equalsIgnoreCase(unit)) {
+            displayQty = q / 240.0;
+        }
+
+        if (displayQty == Math.floor(displayQty)) {
+            return String.valueOf((int) displayQty);
+        }
+        return String.format(Locale.US, "%.1f", displayQty);
+    }
+
+    public static boolean canMake(Recipe recipe, List<PantryItem> pantry) {
+        return getMatchDetails(recipe, pantry).isCanMake();
+    }
+
     public static List<Recipe> getSuggested(List<Recipe> allRecipes, List<PantryItem> pantry) {
         List<Recipe> result = new ArrayList<>();
         if (allRecipes == null || pantry == null) return result;
@@ -146,5 +196,30 @@ public class RecipeMatcher {
             }
         }
         return result;
+    }
+
+    /**
+     * Returns match results for all recipes where the user has at least 1 ingredient,
+     * sorted with 100% matched recipes first, followed by partially matched recipes.
+     */
+    public static List<RecipeMatch> getMatchResults(List<Recipe> allRecipes, List<PantryItem> pantry) {
+        List<RecipeMatch> results = new ArrayList<>();
+        if (allRecipes == null) return results;
+
+        for (Recipe r : allRecipes) {
+            RecipeMatch match = getMatchDetails(r, pantry);
+            if (match.isCanMake() || match.getMatchedCount() > 0) {
+                results.add(match);
+            }
+        }
+
+        Collections.sort(results, (a, b) -> {
+            if (a.isCanMake() != b.isCanMake()) {
+                return a.isCanMake() ? -1 : 1;
+            }
+            return Integer.compare(b.getMatchedCount(), a.getMatchedCount());
+        });
+
+        return results;
     }
 }

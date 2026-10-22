@@ -36,10 +36,10 @@
             android:textSize="14sp" />
 
         <TextView
+            android:id="@+id/textRecipeStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:text="Ready to cook - tap for the method"
             android:textColor="@color/green_primary"
             android:textSize="13sp"
             android:textStyle="bold" />

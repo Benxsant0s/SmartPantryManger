@@ -19,8 +19,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Shows only the recipes the user can make right now, using the
- * strict-matching rule implemented in RecipeMatcher.
+ * Shows recipes matched against the user's pantry.
+ * Displays 100% ready-to-cook recipes first, and partially matched recipes with missing ingredients.
  */
 public class SuggestedRecipesActivity extends AppCompatActivity {
 
@@ -47,7 +47,6 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new RecipeAdapter(new ArrayList<>(), recipe -> {
-            // Intent passes the recipe id to the detail screen
             Intent intent = new Intent(SuggestedRecipesActivity.this, RecipeDetailActivity.class);
             intent.putExtra("recipe_id", recipe.getId());
             startActivity(intent);
@@ -55,7 +54,6 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    // Re-run the matching every time the screen is shown
     @Override
     protected void onResume() {
         super.onResume();
@@ -66,12 +64,25 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
     private void loadSuggestions() {
         List<PantryItem> pantry = db.getAllItems();
         List<Recipe> allRecipes = db.getAllRecipes();
-        List<Recipe> suggested = RecipeMatcher.getSuggested(allRecipes, pantry);
+        List<RecipeMatcher.RecipeMatch> matches = RecipeMatcher.getMatchResults(allRecipes, pantry);
 
-        adapter.setRecipes(suggested);
+        adapter.setMatches(matches);
 
-        if (suggested.isEmpty()) {
-            // Empty state: never show a blank screen
+        int readyCount = 0;
+        for (RecipeMatcher.RecipeMatch match : matches) {
+            if (match.isCanMake()) {
+                readyCount++;
+            }
+        }
+        int almostCount = matches.size() - readyCount;
+
+        if (pantry.isEmpty()) {
+            textEmpty.setText("Your pantry is empty. Tap Pantry below to add ingredients!");
+            textEmpty.setVisibility(View.VISIBLE);
+            recyclerView.setVisibility(View.GONE);
+            textCount.setVisibility(View.GONE);
+        } else if (matches.isEmpty()) {
+            textEmpty.setText("No recipes match your ingredients yet. Try adding staples like salt, butter, or oil!");
             textEmpty.setVisibility(View.VISIBLE);
             recyclerView.setVisibility(View.GONE);
             textCount.setVisibility(View.GONE);
@@ -79,8 +90,14 @@ public class SuggestedRecipesActivity extends AppCompatActivity {
             textEmpty.setVisibility(View.GONE);
             recyclerView.setVisibility(View.VISIBLE);
             textCount.setVisibility(View.VISIBLE);
-            textCount.setText("You can make " + suggested.size()
-                    + (suggested.size() == 1 ? " recipe" : " recipes") + " right now");
+
+            if (readyCount > 0 && almostCount > 0) {
+                textCount.setText(readyCount + (readyCount == 1 ? " recipe" : " recipes") + " ready to cook • " + almostCount + " almost ready");
+            } else if (readyCount > 0) {
+                textCount.setText("You can make " + readyCount + (readyCount == 1 ? " recipe" : " recipes") + " right now");
+            } else {
+                textCount.setText("Almost ready recipes (add missing ingredients to complete):");
+            }
         }
     }
 }
