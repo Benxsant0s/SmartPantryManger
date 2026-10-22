@@ -102,6 +102,6 @@ app/src/main/java/com/example/smartpantrymanger/
 
 ## Author
 
-- Name: YOUR NAME
-- Student number: YOUR STUDENT NUMBER
+- Name: Benedict Monsemvula
+- Student number: 402412754
 - Module: Mobile App Development 700
