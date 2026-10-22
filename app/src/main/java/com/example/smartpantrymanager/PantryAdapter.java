@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartpantrymanger.model.PantryItem;
+import com.example.smartpantrymanager.model.PantryItem;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;

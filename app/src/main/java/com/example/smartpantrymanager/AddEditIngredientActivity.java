@@ -9,8 +9,8 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.smartpantrymanger.database.DatabaseHelper;
-import com.example.smartpantrymanger.model.PantryItem;
+import com.example.smartpantrymanager.database.DatabaseHelper;
+import com.example.smartpantrymanager.model.PantryItem;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;

@@ -9,9 +9,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.smartpantrymanger.database.DatabaseHelper;
-import com.example.smartpantrymanger.model.PantryItem;
-import com.example.smartpantrymanger.model.Recipe;
+import com.example.smartpantrymanager.database.DatabaseHelper;
+import com.example.smartpantrymanager.model.PantryItem;
+import com.example.smartpantrymanager.model.Recipe;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 

@@ -6,9 +6,9 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.smartpantrymanger.database.DatabaseHelper;
-import com.example.smartpantrymanger.model.Recipe;
-import com.example.smartpantrymanger.model.RecipeIngredient;
+import com.example.smartpantrymanager.database.DatabaseHelper;
+import com.example.smartpantrymanager.model.Recipe;
+import com.example.smartpantrymanager.model.RecipeIngredient;
 import com.google.android.material.appbar.MaterialToolbar;
 
 /**
