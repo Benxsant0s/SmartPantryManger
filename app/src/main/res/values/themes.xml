@@ -8,10 +8,28 @@
         <item name="colorSecondary">@color/orange_accent</item>
         <item name="colorOnSecondary">@color/white</item>
         <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/text_primary</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+        <item name="android:textColorPrimary">@color/text_primary</item>
+        <item name="android:textColorSecondary">@color/text_secondary</item>
+        <item name="android:editTextColor">@color/text_primary</item>
+        <item name="android:textColorHint">@color/text_secondary</item>
         <item name="android:colorBackground">@color/page_background</item>
         <item name="android:windowLightStatusBar">true</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="bottomNavigationStyle">@style/Widget.App.BottomNavigationView</item>
     </style>
 
     <style name="Theme.smartpantrymanager" parent="Base.Theme.smartpantrymanager" />
+
+    <style name="Widget.App.BottomNavigationView" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:background">@color/white</item>
+        <item name="itemIconTint">@color/nav_item_color</item>
+        <item name="itemTextColor">@color/nav_item_color</item>
+        <item name="itemActiveIndicatorStyle">@style/Widget.App.BottomNavigationView.ActiveIndicator</item>
+    </style>
+
+    <style name="Widget.App.BottomNavigationView.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/green_container</item>
+    </style>
 </resources>
